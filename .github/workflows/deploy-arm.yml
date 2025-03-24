@@ -1,0 +1,26 @@
+name: Deploy ARM Template to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v3
+
+    - name: Azure CLI 로그인
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: ARM Template 배포 실행
+      run: |
+        az deployment group create \
+          --resource-group devops-rg \
+          --template-file azure-deploy.json \
+          --parameters appServiceName=my-flask-app-0512
