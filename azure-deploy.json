@@ -2,36 +2,35 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "appServiceName": {
-      "type": "string"
-    },
     "location": {
       "type": "string",
       "defaultValue": "Korea Central"
+    },
+    "appServiceName": {
+      "type": "string"
+    },
+    "insightsName": {
+      "type": "string"
     }
   },
   "resources": [
     {
-      "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2022-03-01",
-      "name": "[concat(parameters('appServiceName'), '-plan')]",
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[parameters('insightsName')]",
       "location": "[parameters('location')]",
-      "sku": {
-        "name": "F1",  // Free tier
-        "tier": "Free"
-      },
-      "properties": {}
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web"
+      }
     },
     {
-      "type": "Microsoft.Web/sites",
+      "type": "Microsoft.Web/sites/config",
       "apiVersion": "2022-03-01",
-      "name": "[parameters('appServiceName')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', concat(parameters('appServiceName'), '-plan'))]"
-      ],
+      "name": "[concat(parameters('appServiceName'), '/web')]",
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', concat(parameters('appServiceName'), '-plan'))]"
+        "appInsightsKey": "[reference(resourceId('Microsoft.Insights/components', parameters('insightsName')), '2020-02-02').InstrumentationKey]",
+        "appInsightsConnectionString": "[reference(resourceId('Microsoft.Insights/components', parameters('insightsName')), '2020-02-02').ConnectionString]"
       }
     }
   ]
