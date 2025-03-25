@@ -23,4 +23,6 @@ jobs:
         az deployment group create \
           --resource-group devops-rg \
           --template-file azure-deploy.json \
-          --parameters appServiceName=my-flask-app-0512
+          --parameters \
+            appServiceName=my-flask-app-0512 \
+            insightsName=my-flask-insights-240325
